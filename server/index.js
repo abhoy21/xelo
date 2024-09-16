@@ -5,6 +5,7 @@ const { Server: SocketServer } = require("socket.io");
 const pty = require("node-pty");
 const fs = require("fs/promises");
 const path = require("path");
+const chokidar = require("chokidar");
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,10 @@ const io = new SocketServer(server, {
 });
 
 io.attach(server);
+
+chokidar.watch("/app/user").on("all", (event, path) => {
+  io.emit("file:refresh", path);
+});
 
 ptyProcess.onData((data) => {
   console.log(`Terminal.emit: ${data}`);
