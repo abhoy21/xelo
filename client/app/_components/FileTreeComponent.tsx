@@ -76,7 +76,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
           {isFolder ? (
             <Folder size={16} className='mr-2 text-blue-500' />
           ) : (
-            <File size={16} className='mr-2 text-yellow-400' />
+            <File size={16} className='mr-2 ml-1.5 text-yellow-400' />
           )}
           <span>{name}</span>
         </div>
@@ -132,8 +132,6 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
       currentPath === "root"
         ? `/app/user/${newItemName}`
         : `/app/user/${currentPath}/${newItemName}`;
-    console.log("Creating:", { path: itemPath, type: creatingType });
-    console.log("File Path:", itemPath);
 
     try {
       const response = await fetch(
@@ -152,7 +150,6 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
         throw new Error(`Error: ${response.statusText}. Details: ${errorText}`);
       }
 
-      console.log(`${creatingType} created successfully at ${itemPath}`);
       setNewItemName("");
       setCurrentPath("");
       setCreatingType(null);
@@ -163,8 +160,8 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
 
   return (
     <div className='w-64 bg-[#252525] p-2 overflow-auto border-r border-[#393939]'>
-      <div className='mb-2 font-bold flex justify-between items-center text-gray-400'>
-        <span className='text-lg'>EXPLORER</span>
+      <div className='mb-2 font-bold flex justify-between items-center text-gray-400 border-b border-[#393939]'>
+        <span className='text-lg '>EXPLORER</span>
         <div className='flex space-x-1'>
           <button
             onClick={() => {

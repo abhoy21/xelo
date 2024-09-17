@@ -35,15 +35,15 @@ chokidar.watch("/app/user").on("all", (event, path) => {
 });
 
 ptyProcess.onData((data) => {
-  console.log(`Terminal.emit: ${data}`);
   io.emit("terminal:data", data);
 });
 
 io.on("connection", (socket) => {
-  console.log((`Socket Connected`, socket.id));
+  socket.on("file:change", async ({ path, content }) => {
+    await fs.writeFile(`/app/user${path}`, content);
+  });
 
   socket.on("terminal:write", (data) => {
-    console.log(`Recieved Command: ${data}`);
     ptyProcess.write(data);
   });
 });
@@ -53,8 +53,13 @@ app.get("/files", async (req, res) => {
   return res.json({ tree: fileTree });
 });
 
+app.get("/files/content", async (req, res) => {
+  const path = req.query.path;
+  const content = await fs.readFile(`/app/user${path}`, "utf-8");
+  return res.json({ content });
+});
+
 app.post("/create_file_or_folder", async (req, res) => {
-  console.log("Request Body:", req.body);
   const { path: itemPath, type } = req.body;
   try {
     if (type === "file") {
