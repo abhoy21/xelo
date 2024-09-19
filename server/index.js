@@ -28,7 +28,7 @@ const io = new SocketServer(server, {
   },
 });
 
-io.attach(server);
+// io.attach(server);
 
 chokidar.watch("/app/user").on("all", (event, path) => {
   io.emit("file:refresh", path);
