@@ -170,7 +170,7 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:9000/create_file_or_folder",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/create_file_or_folder`,
         {
           method: "POST",
           headers: {

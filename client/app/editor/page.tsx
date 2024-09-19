@@ -20,7 +20,7 @@ const EditorPage = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:9000");
+    const newSocket = io(process.env.NEXT_PUBLIC_API_BASE_URL as string);
     setSocket(newSocket);
 
     return () => {
@@ -30,7 +30,9 @@ const EditorPage = () => {
 
   const getFileTree = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:9000/files");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/files`,
+      );
       const result = await response.json();
 
       setFileTree(result.tree);

@@ -48,7 +48,7 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
     if (!selectedFile || !isFile) return;
     try {
       const response = await fetch(
-        `http://localhost:9000/files/content?path=${selectedFile}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/content?path=${selectedFile}`,
       );
       const result = await response.json();
       setSelectedFileContent(result.content);
