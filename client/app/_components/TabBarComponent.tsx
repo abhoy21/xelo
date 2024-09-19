@@ -1,44 +1,62 @@
-import useIsFile from "@/hooks/useIsFile"; // Import the useIsFile hook
+import useIsFile from "@/hooks/useIsFile";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type TabBarComponentProps = {
+  onSelect: (path: string) => void;
   selectedFile: string;
 };
 
 interface Tab {
   id: number;
   name: string;
+  path: string;
 }
 
-const TabBarComponent: React.FC<TabBarComponentProps> = ({ selectedFile }) => {
+const TabBarComponent: React.FC<TabBarComponentProps> = ({
+  onSelect,
+  selectedFile,
+}) => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
-
-  const { isFile } = useIsFile(selectedFile); // Use the hook to check if it's a file
+  const { isFile } = useIsFile(selectedFile);
 
   useEffect(() => {
     if (isFile && selectedFile) {
-      // Check if selectedFile is a file and not empty
       const fileName = selectedFile.split("/").pop() || "";
-      const existingTab = tabs.find((tab) => tab.name === fileName);
-
+      const existingTab = tabs.find((tab) => tab.path === selectedFile);
       if (!existingTab) {
-        // If the file is not already open, add it as a new tab
-        const newTab: Tab = { id: Date.now(), name: fileName };
+        const newTab: Tab = {
+          id: Date.now(),
+          name: fileName,
+          path: selectedFile,
+        };
         setTabs((prevTabs) => [...prevTabs, newTab]);
-        setActiveTabId(newTab.id); // Set the new tab as active
+        setActiveTabId(newTab.id);
       } else {
         setActiveTabId(existingTab.id);
       }
     }
-  }, [selectedFile, tabs, isFile]); // Add isFile to dependencies
+  }, [selectedFile, tabs, isFile]);
 
   const closeTab = (tabId: number) => {
     setTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== tabId));
-
     if (activeTabId === tabId) {
-      setActiveTabId(tabs.length > 1 ? tabs[0].id : null);
+      const remainingTabs = tabs.filter((tab) => tab.id !== tabId);
+      if (remainingTabs.length > 0) {
+        setActiveTabId(remainingTabs[0].id);
+        onSelect(remainingTabs[0].path);
+      } else {
+        setActiveTabId(null);
+      }
+    }
+  };
+
+  const handleTabClick = (tabId: number) => {
+    setActiveTabId(tabId);
+    const selectedTab = tabs.find((tab) => tab.id === tabId);
+    if (selectedTab) {
+      onSelect(selectedTab.path);
     }
   };
 
@@ -52,7 +70,7 @@ const TabBarComponent: React.FC<TabBarComponentProps> = ({ selectedFile }) => {
               ? "bg-[#1e1e1e] text-white border-t-2 border-blue-500 min-w-32"
               : "text-gray-400 hover:bg-[#3c3c3c] min-w-32"
           }`}
-          onClick={() => setActiveTabId(tab.id)}
+          onClick={() => handleTabClick(tab.id)}
         >
           {tab.name}
           {activeTabId === tab.id ? (

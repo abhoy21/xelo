@@ -62,7 +62,12 @@ const EditorPage = () => {
       />
       <div className='flex-1 flex flex-col'>
         <div>
-          <TabBarComponent selectedFile={selectedFile} />
+          <TabBarComponent
+            onSelect={(path) => {
+              setSelectedFile(path);
+            }}
+            selectedFile={selectedFile}
+          />
         </div>
         <div className='bg-[#1e1e1e] px-4 py-2 border-b border-[#393939]'>
           <BreadcrumbsComponent tree={fileTree} selectedFile={selectedFile} />

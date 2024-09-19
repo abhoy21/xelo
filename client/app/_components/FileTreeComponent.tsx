@@ -6,8 +6,9 @@ import {
   Folder,
   FolderPlus,
   Plus,
+  Search,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 type FileStructure = {
   [key: string]: FileStructure;
@@ -27,6 +28,7 @@ type FileTreeNodeProps = {
   setCreatingType: React.Dispatch<
     React.SetStateAction<"file" | "folder" | null>
   >;
+  searchTerm: string;
 };
 
 const FileTreeNode: React.FC<FileTreeNodeProps> = ({
@@ -36,6 +38,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   path,
   setCurrentPath,
   setCreatingType,
+  searchTerm,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isFolder = tree !== null;
@@ -57,6 +60,31 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
     setCreatingType("folder");
   };
 
+  const matchesSearch = useCallback(() => {
+    return (
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      path.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [name, path, searchTerm]);
+
+  const hasMatchingChildren = useCallback(() => {
+    if (isFolder) {
+      return Object.entries(tree).some(([childName, childTree]) => {
+        const childPath = `${path}/${childName}`;
+        return (
+          childName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          childPath.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (typeof childTree === "object" && Object.keys(childTree).length > 0)
+        );
+      });
+    }
+    return false;
+  }, [isFolder, tree, path, searchTerm]);
+
+  if (searchTerm && !matchesSearch() && !hasMatchingChildren()) {
+    return null;
+  }
+
   return (
     <li className='py-1'>
       <div className='flex justify-between'>
@@ -66,7 +94,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
         >
           {isFolder && (
             <span onClick={toggleOpen} className='mr-1'>
-              {isOpen ? (
+              {isOpen || (searchTerm && hasMatchingChildren()) ? (
                 <ChevronDown size={16} className='text-gray-400' />
               ) : (
                 <ChevronRight size={16} className='text-gray-400' />
@@ -99,7 +127,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
         )}
       </div>
 
-      {isFolder && isOpen && (
+      {isFolder && (isOpen || (searchTerm && hasMatchingChildren())) && (
         <ul className='pl-4'>
           {Object.entries(tree).map(([childName, childTree]) => (
             <FileTreeNode
@@ -110,6 +138,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
               path={`${path}/${childName}`}
               setCurrentPath={setCurrentPath}
               setCreatingType={setCreatingType}
+              searchTerm={searchTerm}
             />
           ))}
         </ul>
@@ -124,6 +153,12 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
   const [creatingType, setCreatingType] = useState<"file" | "folder" | null>(
     null,
   );
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+  };
 
   const handleCreate = async () => {
     if (!newItemName || !currentPath || !creatingType) return;
@@ -159,7 +194,7 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
   };
 
   return (
-    <div className='w-64 bg-[#252525] p-2 overflow-auto border-r border-[#393939]'>
+    <div className='w-64 bg-[#252525] p-2 overflow-auto border-r border-[#393939] pr-6'>
       <div className='mb-2 font-bold flex justify-between items-center text-gray-400 border-b border-[#393939]'>
         <span className='text-lg '>EXPLORER</span>
         <div className='flex space-x-1'>
@@ -183,19 +218,35 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
           </button>
         </div>
       </div>
-      <ul>
-        {Object.entries(tree).map(([name, subTree]) => (
-          <FileTreeNode
-            key={name}
-            name={name}
-            tree={subTree}
-            onSelect={onSelect}
-            path={`/${name}`}
-            setCurrentPath={setCurrentPath}
-            setCreatingType={setCreatingType}
-          />
-        ))}
-      </ul>
+      <div className='mb-2 relative'>
+        <input
+          type='text'
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder='Search...'
+          className='w-full bg-[#3c3c3c] text-white px-2 py-1 text-sm rounded'
+        />
+        <Search
+          size={14}
+          className='absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400'
+        />
+      </div>
+      <div className='h-[70%] overflow-y-scroll'>
+        <ul>
+          {Object.entries(tree).map(([name, subTree]) => (
+            <FileTreeNode
+              key={name}
+              name={name}
+              tree={subTree}
+              onSelect={onSelect}
+              path={`/${name}`}
+              setCurrentPath={setCurrentPath}
+              setCreatingType={setCreatingType}
+              searchTerm={searchTerm}
+            />
+          ))}
+        </ul>
+      </div>
       {creatingType && (
         <div className='flex items-center mt-2'>
           <input

@@ -1,6 +1,6 @@
 "use client";
 import useIsFile from "@/hooks/useIsFile";
-import Editor from "@monaco-editor/react";
+import { Editor } from "@monaco-editor/react";
 import { useCallback, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import NoEditorPreviewComponent from "./NoEditorPreviewComponent";
@@ -17,7 +17,7 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
   const [selectedFileContent, setSelectedFileContent] = useState("");
   const [code, setCode] = useState("");
 
-  const { isFile } = useIsFile(selectedFile);
+  const { isFile, extension } = useIsFile(selectedFile);
   const isSaved = selectedFileContent === code;
 
   useEffect(() => {
@@ -67,8 +67,12 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
         <Editor
           height='100%'
           width='100%'
-          defaultLanguage='javascript'
-          defaultValue={`// Welcome! Start coding here...\n\n// Write your code in this editor.`}
+          language={
+            extension?.toLowerCase() === "c++"
+              ? "cpp"
+              : extension?.toLowerCase()
+          }
+          defaultValue={`// Welcome to your code editor!\n\n// Start by writing or pasting your code here.\n// Explore the features and enjoy coding!\n\n// Tips:\n// 1. Use the sidebar to navigate between files.\n// 2. Save your work frequently.\n// 3. Customize your editor settings in the preferences.`}
           theme='vs-dark'
           value={code}
           onChange={(e) => {

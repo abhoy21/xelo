@@ -26,27 +26,11 @@ const useIsFile = (path: string) => {
       ".env": "Environment",
       // TOML
       ".toml": "TOML",
-      // PHP
-      ".php": "PHP",
-      // Go
-      ".go": "Go",
-      // Rust
-      ".rs": "Rust",
       // C / C++
       ".c": "C",
       ".cpp": "C++",
       ".h": "Header",
-      // Java
-      ".java": "Java",
-      // Kotlin
-      ".kt": "Kotlin",
-      ".kts": "Kotlin Script",
-      // Ruby
-      ".rb": "Ruby",
-      // Swift
-      ".swift": "Swift",
-      // R
-      ".r": "R",
+
       ".rmd": "R Markdown",
       // Shell scripts
       ".sh": "Shell",
@@ -56,25 +40,8 @@ const useIsFile = (path: string) => {
       ".dockerfile": "Dockerfile",
       // Gitignore
       ".gitignore": "Gitignore",
-      // LaTeX
-      ".tex": "LaTeX",
-      // Haskell
-      ".hs": "Haskell",
-      // Scala
-      ".scala": "Scala",
-      // Elm
-      ".elm": "Elm",
-      // Julia
-      ".jl": "Julia",
-      // F#
-      ".fs": "F#",
-      ".fsi": "F# Interactive",
-      // Groovy
-      ".groovy": "Groovy",
-      // Clojure
-      ".clj": "Clojure",
-      // PowerShell
-      ".ps1": "PowerShell",
+  
+ 
     };
 
     const matchingExtension = Object.keys(fileExtensionsMap).find((extension) =>
@@ -83,7 +50,7 @@ const useIsFile = (path: string) => {
 
     return {
       isFile: !!matchingExtension,
-      extension: matchingExtension ? fileExtensionsMap[matchingExtension] : null,
+      extension: matchingExtension ? fileExtensionsMap[matchingExtension] : undefined,
     };
   }, [path]);
 };

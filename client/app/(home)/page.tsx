@@ -98,7 +98,7 @@ export default function Component() {
                 </Link>
                 <Button
                   variant='outline'
-                  className='border-blue-500 text-gray-500 hover:bg-gray-800 transition-colors'
+                  className='border-gray-600 text-gray-500 hover:bg-gray-800 transition-colors'
                 >
                   <Terminal className='mr-2 h-4 w-4' />
                   Other platforms
