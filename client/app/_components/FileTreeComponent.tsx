@@ -1,14 +1,8 @@
-import {
-  ChevronDown,
-  ChevronRight,
-  FileCode2,
-  FilePlus2,
-  Folder,
-  FolderPlus,
-  Plus,
-  Search,
-} from "lucide-react";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
+import FileCreateForm from "./FileCreateForm";
+import FileSearchBar from "./FileSearchBar";
+import FileTreeHeader from "./FileTreeHeader";
+import FileTreeNode from "./FileTreeNode";
 
 type FileStructure = {
   [key: string]: FileStructure;
@@ -19,134 +13,6 @@ type FileTreeProps = {
   onSelect: (path: string) => void;
 };
 
-type FileTreeNodeProps = {
-  name: string;
-  tree: FileStructure;
-  onSelect: (path: string) => void;
-  path: string;
-  setCurrentPath: React.Dispatch<React.SetStateAction<string>>;
-  setCreatingType: React.Dispatch<
-    React.SetStateAction<"file" | "folder" | null>
-  >;
-  searchTerm: string;
-};
-
-const FileTreeNode: React.FC<FileTreeNodeProps> = ({
-  name,
-  tree,
-  onSelect,
-  path,
-  setCurrentPath,
-  setCreatingType,
-  searchTerm,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const isFolder = tree !== null;
-
-  const toggleOpen = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsOpen(!isOpen);
-  };
-
-  const handleCreateFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentPath(path);
-    setCreatingType("file");
-  };
-
-  const handleCreateFolder = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentPath(path);
-    setCreatingType("folder");
-  };
-
-  const matchesSearch = useCallback(() => {
-    return (
-      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      path.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [name, path, searchTerm]);
-
-  const hasMatchingChildren = useCallback(() => {
-    if (isFolder) {
-      return Object.entries(tree).some(([childName, childTree]) => {
-        const childPath = `${path}/${childName}`;
-        return (
-          childName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          childPath.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (typeof childTree === "object" && Object.keys(childTree).length > 0)
-        );
-      });
-    }
-    return false;
-  }, [isFolder, tree, path, searchTerm]);
-
-  if (searchTerm && !matchesSearch() && !hasMatchingChildren()) {
-    return null;
-  }
-
-  return (
-    <li className='py-1'>
-      <div className='flex justify-between'>
-        <div
-          className='flex items-center cursor-pointer hover:bg-gray-700 p-1 rounded-md w-full'
-          onClick={() => onSelect(path)}
-        >
-          {isFolder && (
-            <span onClick={toggleOpen} className='mr-1'>
-              {isOpen || (searchTerm && hasMatchingChildren()) ? (
-                <ChevronDown size={16} className='text-gray-400' />
-              ) : (
-                <ChevronRight size={16} className='text-gray-400' />
-              )}
-            </span>
-          )}
-          {isFolder ? (
-            <Folder size={16} className='mr-2 text-blue-500' />
-          ) : (
-            <FileCode2 size={16} className='mr-2 ml-1.5 text-yellow-400' />
-          )}
-          <span>{name}</span>
-        </div>
-
-        {isFolder && (
-          <div className='flex space-x-1 mt-1'>
-            <button
-              onClick={handleCreateFile}
-              className='p-1 hover:bg-gray-600 rounded'
-            >
-              <FilePlus2 size={14} className='text-gray-400' />
-            </button>
-            <button
-              onClick={handleCreateFolder}
-              className='p-1 hover:bg-gray-600 rounded'
-            >
-              <FolderPlus size={14} className='text-gray-400' />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {isFolder && (isOpen || (searchTerm && hasMatchingChildren())) && (
-        <ul className='pl-4'>
-          {Object.entries(tree).map(([childName, childTree]) => (
-            <FileTreeNode
-              key={childName}
-              name={childName}
-              tree={childTree}
-              onSelect={onSelect}
-              path={`${path}/${childName}`}
-              setCurrentPath={setCurrentPath}
-              setCreatingType={setCreatingType}
-              searchTerm={searchTerm}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
-};
-
 const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
   const [newItemName, setNewItemName] = useState("");
   const [currentPath, setCurrentPath] = useState("");
@@ -154,11 +20,6 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
     null,
   );
   const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-  };
 
   const handleCreate = async () => {
     if (!newItemName || !currentPath || !creatingType) return;
@@ -193,80 +54,34 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
     }
   };
 
-  console.log("Creating Type:", creatingType);
-  console.log("New Item Name:", newItemName);
-
   return (
     <div className='w-64 bg-[#1a1a1a] p-2 overflow-auto border-r border-[#393939] pr-6'>
-      <div className='mb-2 font-bold flex justify-between items-center text-gray-400 border-b border-[#393939]'>
-        <span className='text-lg '>FILE EXPLORER</span>
-        <div className='flex space-x-1'>
-          <button
-            onClick={() => {
-              setCreatingType("file");
-              setCurrentPath("root");
-            }}
-            className='p-1 hover:bg-gray-600 rounded'
-          >
-            <FilePlus2 size={14} />
-          </button>
-          <button
-            onClick={() => {
-              setCreatingType("folder");
-              setCurrentPath("root");
-            }}
-            className='p-1 hover:bg-gray-600 rounded'
-          >
-            <FolderPlus size={14} />
-          </button>
-        </div>
-      </div>
-      <div className='mb-2 relative'>
-        <input
-          type='text'
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder='Search...'
-          className='w-full bg-[#2a2a2a] text-white px-2 py-1 text-sm rounded'
-        />
-        <Search
-          size={14}
-          className='absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400'
-        />
-      </div>
-      <div className='h-[70%] overflow-y-scroll'>
-        <ul>
-          {Object.entries(tree).map(([name, subTree]) => (
-            <FileTreeNode
-              key={name}
-              name={name}
-              tree={subTree}
-              onSelect={onSelect}
-              path={`/${name}`}
-              setCurrentPath={setCurrentPath}
-              setCreatingType={setCreatingType}
-              searchTerm={searchTerm}
-            />
-          ))}
-        </ul>
-      </div>
-      {creatingType && (
-        <div className='flex items-center mt-2'>
-          <input
-            type='text'
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            placeholder={`Enter ${creatingType} name`}
-            className='bg-gray-700 text-white px-1 py-0.5 text-sm w-full'
+      <FileTreeHeader
+        setCreatingType={setCreatingType}
+        setCurrentPath={setCurrentPath}
+      />
+      <FileSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <FileCreateForm
+        newItemName={newItemName}
+        setNewItemName={setNewItemName}
+        creatingType={creatingType}
+        handleCreate={handleCreate}
+      />
+
+      <ul>
+        {Object.entries(tree).map(([name, subtree]) => (
+          <FileTreeNode
+            key={name}
+            name={name}
+            tree={subtree}
+            onSelect={onSelect}
+            path={name}
+            setCurrentPath={setCurrentPath}
+            setCreatingType={setCreatingType}
+            searchTerm={searchTerm}
           />
-          <button
-            onClick={handleCreate}
-            className='ml-1 p-1 hover:bg-gray-600 rounded'
-          >
-            <Plus size={14} />
-          </button>
-        </div>
-      )}
+        ))}
+      </ul>
     </div>
   );
 };
