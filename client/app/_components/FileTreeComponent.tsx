@@ -1,7 +1,7 @@
 import {
   ChevronDown,
   ChevronRight,
-  File,
+  FileCode2,
   FilePlus2,
   Folder,
   FolderPlus,
@@ -104,7 +104,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
           {isFolder ? (
             <Folder size={16} className='mr-2 text-blue-500' />
           ) : (
-            <File size={16} className='mr-2 ml-1.5 text-yellow-400' />
+            <FileCode2 size={16} className='mr-2 ml-1.5 text-yellow-400' />
           )}
           <span>{name}</span>
         </div>
@@ -193,10 +193,13 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
     }
   };
 
+  console.log("Creating Type:", creatingType);
+  console.log("New Item Name:", newItemName);
+
   return (
-    <div className='w-64 bg-[#252525] p-2 overflow-auto border-r border-[#393939] pr-6'>
+    <div className='w-64 bg-[#1a1a1a] p-2 overflow-auto border-r border-[#393939] pr-6'>
       <div className='mb-2 font-bold flex justify-between items-center text-gray-400 border-b border-[#393939]'>
-        <span className='text-lg '>EXPLORER</span>
+        <span className='text-lg '>FILE EXPLORER</span>
         <div className='flex space-x-1'>
           <button
             onClick={() => {
@@ -224,7 +227,7 @@ const FileTree: React.FC<FileTreeProps> = ({ tree, onSelect }) => {
           value={searchTerm}
           onChange={handleSearch}
           placeholder='Search...'
-          className='w-full bg-[#3c3c3c] text-white px-2 py-1 text-sm rounded'
+          className='w-full bg-[#2a2a2a] text-white px-2 py-1 text-sm rounded'
         />
         <Search
           size={14}

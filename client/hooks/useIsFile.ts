@@ -29,6 +29,7 @@ const useIsFile = (path: string) => {
       // C / C++
       ".c": "C",
       ".cpp": "C++",
+      ".java": "Java",
       ".h": "Header",
 
       ".rmd": "R Markdown",
@@ -40,7 +41,7 @@ const useIsFile = (path: string) => {
       ".dockerfile": "Dockerfile",
       // Gitignore
       ".gitignore": "Gitignore",
-  
+      ".txt": "Text",
  
     };
 

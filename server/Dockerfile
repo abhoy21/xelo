@@ -6,11 +6,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     curl \
     python3 \
+    openjdk-11-jdk \
     make \
     g++ \
     bash \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
+    && npm install -g typescript \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user

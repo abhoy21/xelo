@@ -61,7 +61,7 @@ const TabBarComponent: React.FC<TabBarComponentProps> = ({
   };
 
   return (
-    <div className='flex bg-[#2d2d2d] text-sm space-x-1 w-full'>
+    <div className='flex bg-[#1a1a1a] text-sm space-x-1 w-full'>
       {tabs.map((tab) => (
         <div
           key={tab.id}
