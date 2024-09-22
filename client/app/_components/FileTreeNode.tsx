@@ -7,6 +7,7 @@ import {
   FolderPlus,
 } from "lucide-react";
 import React, { useCallback, useState } from "react";
+import ContextMenuComponent from "./ContextMenuComponent";
 
 type FileStructure = {
   [key: string]: FileStructure;
@@ -35,6 +36,8 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isFolder = tree !== null;
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
   const toggleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,8 +81,44 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
     return null;
   }
 
+  const handleRightClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    setMenuPosition({ x: e.pageX, y: e.pageY });
+    setShowContextMenu(true);
+    setCurrentPath(path);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ path }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error deleting file/folder: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Failed to delete:", error);
+    } finally {
+      setShowContextMenu(false);
+    }
+  };
+
   return (
-    <li className='py-1'>
+    <li
+      className='py-1'
+      onContextMenu={handleRightClick}
+      onClick={() => onSelect(path)}
+    >
       <div className='flex justify-between'>
         <div
           className='flex items-center cursor-pointer hover:bg-[#2e2e2e] duration-300 ease-in-out p-1 rounded-md w-full'
@@ -100,6 +139,14 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
             <FileCode2 size={16} className='mr-2 ml-1.5 text-yellow-400' />
           )}
           <span>{name}</span>
+          {showContextMenu && (
+            <ContextMenuComponent
+              x={menuPosition.x}
+              y={menuPosition.y}
+              onDelete={handleDelete}
+              onClose={() => setShowContextMenu(false)}
+            />
+          )}
         </div>
 
         {isFolder && (

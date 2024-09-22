@@ -24,7 +24,7 @@ const ptyProcess = pty.spawn("bash", [], {
 const io = new SocketServer(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
   },
 });
 
@@ -168,6 +168,43 @@ app.post("/create_file_or_folder", async (req, res) => {
   } catch (error) {
     console.error("Error creating file or folder:", error);
     res.status(500).json({ error: "Failed to create file or folder" });
+  }
+});
+
+app.delete("/delete", async (req, res) => {
+  const { path: itemPath } = req.body;
+
+  const safePath = path.join("/app/user", itemPath);
+
+  if (!safePath.startsWith("/app/user")) {
+    return res.status(400).json({ error: "Invalid file path." });
+  }
+
+  try {
+    const stat = await fs.stat(safePath);
+
+    if (stat.isDirectory()) {
+      // Use fs.rm to remove directories recursively
+      await fs.rm(safePath, { recursive: true, force: true });
+    } else {
+      // Use fs.unlink to remove files
+      await fs.unlink(safePath);
+    }
+
+    io.emit("file:refresh");
+    res.sendStatus(204); // No Content
+  } catch (error) {
+    console.error("Error deleting file or folder:", error);
+
+    if (error.code === "ENOENT") {
+      return res.status(404).json({ error: "File or folder not found." });
+    } else if (error.code === "EACCES") {
+      return res.status(403).json({ error: "Permission denied." });
+    } else {
+      return res
+        .status(500)
+        .json({ error: "Failed to delete file or folder." });
+    }
   }
 });
 
