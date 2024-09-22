@@ -492,7 +492,7 @@ export default function Component() {
           </div>
           <div className='mt-6 text-center'>
             <p className='text-sm text-gray-400'>
-              © 2023 Microsoft Corporation. All rights reserved.
+              © 2024 Xelo. All rights reserved.
             </p>
           </div>
         </div>
