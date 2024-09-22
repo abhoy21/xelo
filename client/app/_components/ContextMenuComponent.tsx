@@ -36,7 +36,7 @@ const ContextMenuComponent: React.FC<ContextMenuProps> = ({
       </button>
       <button
         onClick={onClose}
-        className='flex items-center w-full text-left px-2 py-1 hover:bg-gray-700 rounded mt-1'
+        className='flex items-center w-full text-left px-2 py-1 hover:bg-[#2e2e2e] rounded mt-1'
       >
         <X size={16} className='mr-2 text-yellow-500' />
         Close
