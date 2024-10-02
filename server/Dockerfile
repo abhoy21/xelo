@@ -31,6 +31,8 @@ RUN npm install --production && npm install node-pty
 # Copy the rest of the application files including Prisma schema
 COPY . .
 
+RUN npx prisma generate
+
 
 # Change ownership and permissions
 RUN mkdir -p /app/user \
