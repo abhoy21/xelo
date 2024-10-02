@@ -106,7 +106,7 @@ exports.handleGitHubCallback = async (req, res) => {
     }
 
     res.redirect(
-      `http://localhost:3000?githubId=${
+      `https://xelo.onrender.com?githubId=${
         userData.id
       }&access_token=${encodeURIComponent(accessToken)}`,
     );
