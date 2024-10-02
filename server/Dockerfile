@@ -25,13 +25,15 @@ RUN useradd -m -s /bin/bash xelo_user
 WORKDIR /app
 COPY package*.json ./
 
+# Copy the rest of the application files including Prisma schema
+COPY . .
+
 # Install npm dependencies
 RUN npm install --production && npm install node-pty
 
 RUN npx prisma generate
 
-# Copy the rest of the application files including Prisma schema
-COPY . .
+
 
 
 
