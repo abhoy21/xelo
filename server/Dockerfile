@@ -51,4 +51,4 @@ WORKDIR /app/user
 EXPOSE 9000
 
 # Command to run the application (without migrations)
-CMD ["node", "/app/index.js"]
+CMD ["sh", "-c", "cd /app && npx prisma generate && node /app/index.js"]
