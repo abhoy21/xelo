@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "prisma generate",
+   "build": "npx prisma generate",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "migrate:deploy": "prisma migrate deploy",
     "postinstall": "prisma generate"
   },
   "keywords": [],
