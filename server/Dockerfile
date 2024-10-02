@@ -28,10 +28,12 @@ COPY package*.json ./
 # Install npm dependencies
 RUN npm install --production && npm install node-pty
 
+RUN npx prisma generate
+
 # Copy the rest of the application files including Prisma schema
 COPY . .
 
-RUN npx prisma generate
+
 
 
 # Change ownership and permissions
