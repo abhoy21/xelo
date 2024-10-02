@@ -12,7 +12,7 @@ const prisma = new PrismaClient({
 console.log("database_URL", process.env.DATABASE_URL);
 
 exports.redirectToGitHub = (req, res) => {
-  const redirectUri = "http://localhost:9000/github/callback";
+  const redirectUri = "https://xelo-api.onrender.com/callback";
   const clientId = process.env.GITHUB_CLIENT_ID;
 
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(

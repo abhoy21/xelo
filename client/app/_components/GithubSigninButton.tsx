@@ -7,7 +7,7 @@ const GitHubSignIn: React.FC = () => {
 
   const handleSignIn = () => {
     setIsLoading(true);
-    window.location.href = "http://localhost:9000/github";
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/github`;
   };
 
   return (
