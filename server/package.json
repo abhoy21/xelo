@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+     "build": "npm install && npx prisma generate && node your_start_script.js",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "prisma migrate deploy",
-    "generate": "prisma generate",
-    "build": "npm install && npx prisma generate && node your_start_script.js"
+    "generate": "prisma generate"
+   
+     
   },
   "keywords": [],
   "author": "",
