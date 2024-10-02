@@ -15,7 +15,7 @@ const TerminalComponent: React.FC = () => {
     const term = new XTerminal({
       cursorBlink: true,
       rows: 30,
-      cols: 80,
+      cols: 120,
       theme: {
         background: "#1a1a1a",
         foreground: "#d1d5db",
@@ -46,7 +46,7 @@ const TerminalComponent: React.FC = () => {
     <div
       ref={terminalRef}
       id='terminal'
-      className='h-[25%] bg-[#1a1a1a] text-gray-400 absolute bottom-0 left-0 right-0  p-2 overflow-auto border-t border-[#393939]'
+      className='h-[25%] w-full bg-[#1a1a1a] text-gray-400 absolute bottom-0 left-0 right-0 p-2 overflow-auto border-t border-[#393939]'
     >
       <div className='flex items-center mb-2'>
         <Terminal size={14} className='mr-2' />

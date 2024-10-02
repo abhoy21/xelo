@@ -35,13 +35,18 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   searchTerm,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const isFolder = tree !== null;
+  const isFolder = typeof tree === "object" && tree !== null;
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
   const toggleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(!isOpen);
+  };
+
+  const handleSelect = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect(path);
   };
 
   const handleCreateFile = (e: React.MouseEvent) => {
@@ -83,7 +88,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
-
+    e.stopPropagation();
     setMenuPosition({ x: e.pageX, y: e.pageY });
     setShowContextMenu(true);
     setCurrentPath(path);
@@ -114,15 +119,11 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   };
 
   return (
-    <li
-      className='py-1'
-      onContextMenu={handleRightClick}
-      onClick={() => onSelect(path)}
-    >
+    <li className='py-1' onContextMenu={handleRightClick}>
       <div className='flex justify-between'>
         <div
           className='flex items-center cursor-pointer hover:bg-[#2e2e2e] duration-300 ease-in-out p-1 rounded-md w-full'
-          onClick={() => onSelect(path)}
+          onClick={handleSelect}
         >
           {isFolder && (
             <span onClick={toggleOpen} className='mr-1'>
@@ -139,14 +140,6 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
             <FileCode2 size={16} className='mr-2 ml-1.5 text-yellow-400' />
           )}
           <span>{name}</span>
-          {showContextMenu && (
-            <ContextMenuComponent
-              x={menuPosition.x}
-              y={menuPosition.y}
-              onDelete={handleDelete}
-              onClose={() => setShowContextMenu(false)}
-            />
-          )}
         </div>
 
         {isFolder && (
@@ -166,6 +159,15 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
           </div>
         )}
       </div>
+
+      {showContextMenu && (
+        <ContextMenuComponent
+          x={menuPosition.x}
+          y={menuPosition.y}
+          onDelete={handleDelete}
+          onClose={() => setShowContextMenu(false)}
+        />
+      )}
 
       {isFolder && (isOpen || (searchTerm && hasMatchingChildren())) && (
         <ul className='pl-4'>

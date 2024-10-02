@@ -11,7 +11,6 @@ export default function Hero() {
     const hero = heroRef.current;
     if (!hero) return;
 
-    // Hero section animation with GSAP
     const heroTl = gsap.timeline({ delay: 0.5 });
     heroTl
       .from(hero.querySelector("h1"), {
@@ -60,7 +59,7 @@ export default function Hero() {
           </div>
           <div className='space-x-4'>
             <Link
-              href='/editor'
+              href='/dashboard'
               className='inline-flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 transition-colors px-4 py-2 rounded-md text-sm font-medium'
             >
               <ArrowUpRight className='mr-2 h-4 w-4' />

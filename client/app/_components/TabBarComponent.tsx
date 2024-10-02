@@ -1,3 +1,4 @@
+"use client";
 import useIsFile from "@/hooks/useIsFile";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -7,11 +8,11 @@ type TabBarComponentProps = {
   selectedFile: string;
 };
 
-interface Tab {
+type Tab = {
   id: number;
   name: string;
   path: string;
-}
+};
 
 const TabBarComponent: React.FC<TabBarComponentProps> = ({
   onSelect,
@@ -61,33 +62,33 @@ const TabBarComponent: React.FC<TabBarComponentProps> = ({
   };
 
   return (
-    <div className='flex bg-[#1a1a1a] text-sm space-x-1 w-full'>
-      {tabs.map((tab) => (
-        <div
-          key={tab.id}
-          className={`px-3 py-1 cursor-pointer flex items-center justify-between ${
-            activeTabId === tab.id
-              ? "bg-[#1e1e1e] text-white border-t-2 border-blue-500 min-w-32"
-              : "text-gray-400 hover:bg-[#3c3c3c] min-w-32"
-          }`}
-          onClick={() => handleTabClick(tab.id)}
-        >
-          {tab.name}
-          {activeTabId === tab.id ? (
-            <button
-              className='ml-2'
-              onClick={(e) => {
-                e.stopPropagation();
-                closeTab(tab.id);
-              }}
-            >
-              <X size={14} className='text-red-500 hover:text-red-700' />
-            </button>
-          ) : (
-            <></>
-          )}
-        </div>
-      ))}
+    <div className='flex bg-[#1a1a1a] text-sm w-full items-center relative'>
+      <div className='flex overflow-x-auto whitespace-nowrap hide-scrollbar'>
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={`px-3 py-1 cursor-pointer flex items-center justify-between ${
+              activeTabId === tab.id
+                ? "bg-[#1e1e1e] text-white border-t-2 border-blue-500 min-w-32"
+                : "text-gray-400 hover:bg-[#3c3c3c] min-w-32"
+            }`}
+            onClick={() => handleTabClick(tab.id)}
+          >
+            {tab.name}
+            {activeTabId === tab.id ? (
+              <button
+                className='ml-2'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeTab(tab.id);
+                }}
+              >
+                <X size={14} className='text-red-500 hover:text-red-700' />
+              </button>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

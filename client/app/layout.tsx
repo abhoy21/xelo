@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={cn("antialiased", fontHeading.variable, fontBody.variable)}
+        className={`antialiased ${fontHeading.variable} ${fontBody.variable}`}
       >
         {children}
       </body>

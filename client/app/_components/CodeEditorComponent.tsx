@@ -27,7 +27,7 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
           path: selectedFile,
           content: code,
         });
-      }, 3 * 1000);
+      }, 3000);
       return () => {
         clearTimeout(timer);
       };
@@ -47,6 +47,7 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
   const getFileContents = useCallback(async () => {
     if (!selectedFile || !isFile) return;
     try {
+      console.log("Selected file Path", selectedFile);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/content?path=${selectedFile}`,
       );
@@ -72,7 +73,7 @@ const CodeEditorComponent: React.FC<CodeEditorProps> = ({
               ? "cpp"
               : extension?.toLowerCase()
           }
-          defaultValue={`// Welcome to your code editor!\n\n// Start by writing or pasting your code here.\n// Explore the features and enjoy coding!\n\n// Tips:\n// 1. Use the sidebar to navigate between files.\n// 2. Save your work frequently.\n// 3. Customize your editor settings in the preferences.`}
+          defaultValue={`// Welcome to your code editor!\n\n// Start by writing or pasting your code here.\n// Explore the features and enjoy coding!\n\n// Tips:\n// 1. Use the sidebar to navigate between files.\n// 2. Save your work frequently.`}
           theme='vs-dark'
           value={code}
           onChange={(e) => {
