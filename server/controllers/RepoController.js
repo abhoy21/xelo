@@ -229,14 +229,6 @@ exports.deleteRepo = async (req, res) => {
 exports.cloneRepo = async (req, res) => {
   const { repoName, access_token } = req.body;
 
-  // Validate required parameters
-  if (!repoName || !access_token) {
-    return res.status(400).json({
-      error: "Missing required parameters",
-      details: "Both repoName and access_token are required",
-    });
-  }
-
   console.log(`Cloning repository: ${repoName}`);
 
   try {
@@ -248,57 +240,53 @@ exports.cloneRepo = async (req, res) => {
       return res.status(404).json({ error: "Repository not found" });
     }
 
-    if (!repository.url) {
-      return res.status(400).json({ error: "Repository URL is missing" });
+    const repoUrl = repository.url;
+
+    // Get UNIQUE_USER_ID from environment variable
+    const uniqueUserId = process.env.UNIQUE_USER_ID;
+    if (!uniqueUserId) {
+      return res.status(500).json({ message: "UNIQUE_USER_ID is not defined" });
     }
 
-    // Ensure APP_DIR exists and default to /app/user if not set
-    const baseDir = process.env.APP_DIR || "/app/user";
-    const repoPath = path.join(baseDir, repoName);
+    // Construct the path for cloning inside the user's directory
+    const appDir = process.env.APP_DIR; // Should be '/app/user'
+    const repoPath = path.join(appDir, uniqueUserId, repoName); // Use uniqueUserId here
 
-    // Check if repository already exists
     try {
       await fs.access(repoPath);
       return res.status(200).json({
         message: `Repository already cloned: ${repoName}`,
         repoPath,
       });
-    } catch (err) {
-      // Directory doesn't exist, continue with clone
-    }
+    } catch (err) {}
 
-    // Construct clone URL with access token
-    const [protocol, rest] = repository.url.split("://");
+    const [protocol, rest] = repoUrl.split("://");
     const cloneUrl = `${protocol}://${access_token}@${rest}`;
 
-    // Execute git clone command
-    const cloneCommand = `git clone ${cloneUrl}`;
-    exec(cloneCommand, { cwd: baseDir }, async (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error cloning repository: ${stderr}`);
-        return res.status(500).json({
-          error: "Error cloning repository",
-          details: stderr,
+    exec(
+      `git clone ${cloneUrl}`,
+      { cwd: path.join(appDir, uniqueUserId) },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error cloning repository: ${stderr}`);
+          return res.status(500).json({ message: "Error cloning repository" });
+        }
+
+        console.log(`Repository cloned successfully: ${repoName}`);
+
+        // Notify clients about file refresh if using WebSocket or similar
+        const io = getIO();
+        io.emit("file:refresh");
+
+        return res.status(200).json({
+          message: `Repository cloned successfully: ${repoName}`,
+          repoPath,
         });
-      }
-
-      console.log(`Repository cloned successfully: ${repoName}`);
-
-      // Notify connected clients about the file system change
-      const io = getIO();
-      io.emit("file:refresh");
-
-      return res.status(200).json({
-        message: `Repository cloned successfully: ${repoName}`,
-        repoPath,
-      });
-    });
+      },
+    );
   } catch (error) {
     console.error("Error cloning repository:", error);
-    return res.status(500).json({
-      error: "Error cloning repository",
-      details: error.message,
-    });
+    return res.status(500).json({ message: "Error cloning repository" });
   }
 };
 
