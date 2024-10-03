@@ -61,7 +61,7 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PORT=9000
-ENV APP_DIR=/app/user
+
 
 # Install required packages and Node.js
 RUN apt-get update && apt-get install -y \
