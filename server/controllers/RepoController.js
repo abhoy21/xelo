@@ -243,11 +243,8 @@ exports.cloneRepo = async (req, res) => {
     }
 
     const repoUrl = repository.url;
-    const safeRepoPath = path.join(
-      process.env.APP_DIR || "/app/user",
-      itemPath,
-    );
-    const repoPath = path.join(safeRepoPath, repoName);
+
+    const repoPath = path.join(process.env.APP_DIR || "/app/user", repoName);
 
     try {
       await fs.access(repoPath);
