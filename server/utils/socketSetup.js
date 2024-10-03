@@ -40,7 +40,10 @@ exports.setupSocketIO = (server) => {
     socket.emit("file:refresh");
 
     socket.on("file:change", async ({ path, content }) => {
-      const safePath = `/app/user/${path}`;
+      const uniqueUserId = process.env.UNIQUE_USER_ID;
+      const appDir = process.env.APP_DIR;
+      const safePath = path.join(appDir, path);
+
       console.log(`Attempting to save file at: ${safePath}`); // Log before writing
       try {
         await fs.writeFile(safePath, content);
