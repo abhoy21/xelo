@@ -83,10 +83,7 @@ RUN useradd -m -s /bin/bash $USERNAME
 # Set working directory
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
-
-# Copy the rest of the application files
+# Copy all application files
 COPY . .
 
 # Install dependencies
@@ -96,7 +93,9 @@ RUN npm install --production && npm install node-pty
 RUN npx prisma generate --schema=prisma/schema.prisma
 
 # Setup user directory and permissions
+# Do this BEFORE switching to non-root user
 RUN mkdir -p /app/user \
+    && chmod +x /app/start.sh \
     && chown -R $USERNAME:$USERNAME /app \
     && chmod -R 755 /app
 
@@ -106,8 +105,5 @@ USER $USERNAME
 # Expose the port
 EXPOSE $PORT
 
-# Start script that includes user isolation logic
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
+# Use the start script as the entry point
 CMD ["/app/start.sh"]
