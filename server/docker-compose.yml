@@ -9,5 +9,6 @@ services:
       - "9000:9000"
     environment:
       NODE_ENV: production
+      APP_DIR: /app/user
     volumes:
       - .:/app  # Mount current directory to /app in container (optional)
