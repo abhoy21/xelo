@@ -29,8 +29,8 @@ COPY . .
 # Install npm dependencies
 RUN npm install --production && npm install node-pty
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client using the schema located in /app/prisma/schema.prisma
+RUN npx prisma generate --schema=prisma/schema.prisma
 
 # Change ownership and permissions
 RUN mkdir -p /app/user \
@@ -47,4 +47,4 @@ WORKDIR /app/user
 EXPOSE 9000
 
 # Command to run the application (without migrations)
-CMD ["sh", "-c", "cd /app/user && npx prisma generate && node /app/index.js"]
+CMD ["sh", "-c", "cd /app/user && npx prisma generate --schema=/app/prisma/schema.prisma && node /app/index.js"]
