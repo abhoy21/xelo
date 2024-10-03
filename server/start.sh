@@ -12,4 +12,4 @@ cd "$USER_DIR"
 npx prisma generate --schema=/app/prisma/schema.prisma
 
 # Start the application with user-specific environment
-NODE_ENV=production USER_ID=$UNIQUE_USER_ID node /app/index.js
+exec node /app/index.js
