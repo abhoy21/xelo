@@ -8,8 +8,8 @@ USER_DIR="/app/user/$UNIQUE_USER_ID"
 mkdir -p "$USER_DIR"
 cd "$USER_DIR"
 
-# Export the unique user ID as an environment variable
-export UNIQUE_USER_ID
+# Save the unique user ID to a file
+echo "$UNIQUE_USER_ID" > "$USER_DIR/unique_user_id.txt"
 
 # Generate Prisma client for this user
 npx prisma generate --schema=/app/prisma/schema.prisma

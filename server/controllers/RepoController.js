@@ -232,6 +232,13 @@ exports.cloneRepo = async (req, res) => {
   console.log(`Cloning repository: ${repoName}`);
 
   try {
+    // Read the unique user ID from the file
+    const uniqueUserIdPath = path.join(
+      process.env.APP_DIR,
+      "unique_user_id.txt",
+    );
+    const uniqueUserId = await fs.readFile(uniqueUserIdPath, "utf8");
+
     const repository = await prisma.repository.findFirst({
       where: { name: repoName },
     });
@@ -242,15 +249,9 @@ exports.cloneRepo = async (req, res) => {
 
     const repoUrl = repository.url;
 
-    // Get UNIQUE_USER_ID from environment variable
-    const uniqueUserId = process.env.UNIQUE_USER_ID;
-    if (!uniqueUserId) {
-      return res.status(500).json({ message: "UNIQUE_USER_ID is not defined" });
-    }
-
     // Construct the path for cloning inside the user's directory
     const appDir = process.env.APP_DIR; // Should be '/app/user'
-    const repoPath = path.join(appDir, uniqueUserId, repoName); // Use uniqueUserId here
+    const repoPath = path.join(appDir, uniqueUserId.trim(), repoName); // Use uniqueUserId here
 
     try {
       await fs.access(repoPath);
@@ -265,7 +266,7 @@ exports.cloneRepo = async (req, res) => {
 
     exec(
       `git clone ${cloneUrl}`,
-      { cwd: path.join(appDir, uniqueUserId) },
+      { cwd: path.join(appDir, uniqueUserId.trim()) },
       (error, stdout, stderr) => {
         if (error) {
           console.error(`Error cloning repository: ${stderr}`);
