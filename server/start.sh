@@ -11,6 +11,9 @@ cd "$USER_DIR"
 # Set APP_DIR environment variable
 export APP_DIR="$USER_DIR"  # Add this line
 
+# Set UNIQUE_USER_ID environment variable
+export UNIQUE_USER_ID="$UNIQUE_USER_ID"  # Add this line
+
 # Generate Prisma client for this user
 npx prisma generate --schema=/app/prisma/schema.prisma
 
