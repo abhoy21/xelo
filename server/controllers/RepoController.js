@@ -3,7 +3,6 @@ const axios = require("axios");
 const { getIO } = require("../utils/socketSetup");
 const { exec } = require("child_process");
 const path = require("path");
-const fs = require("fs").promises;
 
 const prisma = new PrismaClient();
 
@@ -233,13 +232,6 @@ exports.cloneRepo = async (req, res) => {
   console.log(`Cloning repository: ${repoName}`);
 
   try {
-    // Read the unique user ID from the file
-    const uniqueUserIdPath = path.join(
-      process.env.APP_DIR,
-      "unique_user_id.txt",
-    );
-    const uniqueUserId = await fs.readFile(uniqueUserIdPath, "utf8");
-
     const repository = await prisma.repository.findFirst({
       where: { name: repoName },
     });
@@ -250,9 +242,9 @@ exports.cloneRepo = async (req, res) => {
 
     const repoUrl = repository.url;
 
-    // Construct the path for cloning inside the user's directory
-    const appDir = process.env.APP_DIR; // Should be '/app/user'
-    const repoPath = path.join(appDir, uniqueUserId.trim(), repoName); // Use uniqueUserId here
+    // Get UNIQUE_USER_ID from environment variable
+    const appDir = process.env.APP_DIR; // This will now be '/app/uniqueuserid'
+    const repoPath = path.join(appDir, repoName);
 
     try {
       await fs.access(repoPath);
@@ -267,7 +259,7 @@ exports.cloneRepo = async (req, res) => {
 
     exec(
       `git clone ${cloneUrl}`,
-      { cwd: path.join(appDir, uniqueUserId.trim()) },
+      { cwd: path.join(appDir, uniqueUserId) },
       (error, stdout, stderr) => {
         if (error) {
           console.error(`Error cloning repository: ${stderr}`);

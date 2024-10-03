@@ -31,7 +31,7 @@ const generateFileTree = async (directory) => {
 
 exports.getFiles = async (req, res) => {
   try {
-    const fileTree = await generateFileTree(process.env.APP_DIR || "/app/user");
+    const fileTree = await generateFileTree(process.env.APP_DIR || "/app");
     return res.json({ tree: fileTree });
   } catch (error) {
     console.error("Error retrieving files:", error);
@@ -43,10 +43,10 @@ exports.getFileContent = async (req, res) => {
   const requestedPath = req.query.path;
   console.log(`Requested Path: ${requestedPath}`);
 
-  const safePath = path.join(process.env.APP_DIR || "/app/user", requestedPath);
+  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
   console.log(`Safe Path: ${safePath}`);
 
-  if (!safePath.startsWith((process.env.APP_DIR || "/app/user") + "/")) {
+  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
     console.log(`Invalid path requested: ${safePath}`);
     return res.status(400).json({ error: "Invalid file path." });
   }
@@ -73,13 +73,13 @@ exports.createFileOrFolder = async (req, res) => {
   const { path: itemPath, type: creatingType } = req.body;
 
   let adjustedPath = itemPath;
-  if (itemPath.startsWith(process.env.APP_DIR || "/app/user")) {
+  if (itemPath.startsWith(process.env.APP_DIR || "/app")) {
     adjustedPath = itemPath.replace(/^\/app\/user/, "");
   }
 
-  const safePath = path.join(process.env.APP_DIR || "/app/user", adjustedPath);
+  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
 
-  if (!safePath.startsWith((process.env.APP_DIR || "/app/user") + "/")) {
+  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
     return res.status(400).json({ error: "Invalid file path." });
   }
 
@@ -118,9 +118,9 @@ exports.createFileOrFolder = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   const { path: itemPath } = req.body;
 
-  const safePath = path.join(process.env.APP_DIR || "/app/user", itemPath);
+  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
 
-  if (!safePath.startsWith((process.env.APP_DIR || "/app/user") + "/")) {
+  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
     return res.status(400).json({ error: "Invalid file path." });
   }
 
