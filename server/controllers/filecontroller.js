@@ -2,6 +2,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const { getIO } = require("../utils/socketSetup");
 
+// Function to generate a file tree
 const generateFileTree = async (directory) => {
   const tree = {};
 
@@ -29,9 +30,11 @@ const generateFileTree = async (directory) => {
   return tree;
 };
 
+// Get files endpoint
 exports.getFiles = async (req, res) => {
   try {
-    const fileTree = await generateFileTree(process.env.APP_DIR || "/app");
+    const appDir = process.env.APP_DIR; // Use APP_DIR for dynamic path
+    const fileTree = await generateFileTree(appDir); // Pass the dynamic directory
     return res.json({ tree: fileTree });
   } catch (error) {
     console.error("Error retrieving files:", error);
@@ -39,14 +42,17 @@ exports.getFiles = async (req, res) => {
   }
 };
 
+// Get file content endpoint
 exports.getFileContent = async (req, res) => {
   const requestedPath = req.query.path;
   console.log(`Requested Path: ${requestedPath}`);
 
-  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
+  const appDir = process.env.APP_DIR; // Use APP_DIR for dynamic path
+  const safePath = path.join(appDir, requestedPath); // Use requestedPath directly
+
   console.log(`Safe Path: ${safePath}`);
 
-  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
+  if (!safePath.startsWith(appDir + "/")) {
     console.log(`Invalid path requested: ${safePath}`);
     return res.status(400).json({ error: "Invalid file path." });
   }
@@ -69,17 +75,14 @@ exports.getFileContent = async (req, res) => {
   }
 };
 
+// Create file or folder endpoint
 exports.createFileOrFolder = async (req, res) => {
   const { path: itemPath, type: creatingType } = req.body;
 
-  let adjustedPath = itemPath;
-  if (itemPath.startsWith(process.env.APP_DIR || "/app")) {
-    adjustedPath = itemPath.replace(/^\/app\/user/, "");
-  }
+  const appDir = process.env.APP_DIR; // Use APP_DIR for dynamic path
+  const safePath = path.join(appDir, itemPath); // Construct safe path
 
-  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
-
-  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
+  if (!safePath.startsWith(appDir + "/")) {
     return res.status(400).json({ error: "Invalid file path." });
   }
 
@@ -115,12 +118,14 @@ exports.createFileOrFolder = async (req, res) => {
   }
 };
 
+// Delete item endpoint
 exports.deleteItem = async (req, res) => {
   const { path: itemPath } = req.body;
 
-  const safePath = path.join(process.env.APP_DIR || "/app", adjustedPath);
+  const appDir = process.env.APP_DIR; // Use APP_DIR for dynamic path
+  const safePath = path.join(appDir, itemPath); // Construct safe path
 
-  if (!safePath.startsWith((process.env.APP_DIR || "/app") + "/")) {
+  if (!safePath.startsWith(appDir + "/")) {
     return res.status(400).json({ error: "Invalid file path." });
   }
 
