@@ -16,8 +16,6 @@ RUN apt-get update && apt-get install -y \
     && npm install -g typescript \
     && rm -rf /var/lib/apt/lists/*
 
-
-
 # Create a non-root user
 RUN useradd -m -s /bin/bash xelo_user
 
@@ -31,12 +29,8 @@ COPY . .
 # Install npm dependencies
 RUN npm install --production && npm install node-pty
 
+# Generate Prisma client
 RUN npx prisma generate
-
-
-
-
-
 
 # Change ownership and permissions
 RUN mkdir -p /app/user \
@@ -53,4 +47,4 @@ WORKDIR /app/user
 EXPOSE 9000
 
 # Command to run the application (without migrations)
-CMD ["sh", "-c", "cd /app && npx prisma generate && node /app/index.js"]
+CMD ["sh", "-c", "cd /app/user && npx prisma generate && node /app/index.js"]

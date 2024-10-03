@@ -14,7 +14,7 @@ const TerminalComponent: React.FC = () => {
 
     const term = new XTerminal({
       cursorBlink: true,
-      rows: 30,
+      rows: 60,
       cols: 120,
       theme: {
         background: "#1a1a1a",
