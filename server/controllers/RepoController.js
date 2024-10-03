@@ -3,6 +3,7 @@ const axios = require("axios");
 const { getIO } = require("../utils/socketSetup");
 const { exec } = require("child_process");
 const path = require("path");
+const fs = require("fs").promises;
 
 const prisma = new PrismaClient();
 
