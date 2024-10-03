@@ -300,8 +300,14 @@ exports.runGitSaveCommands = async (req, res) => {
       .status(400)
       .json({ error: "Repository name and access token are required." });
   }
+  const uniqueUserId = process.env.UNIQUE_USER_ID; // Updated line
+  if (!uniqueUserId) {
+    return res.status(500).json({ message: "UNIQUE_USER_ID is not defined" });
+  }
 
-  const repoPath = `/app/user/${repoName}`;
+  // Construct the path for cloning inside the user's directory
+  const appDir = process.env.APP_DIR; // Should be '/app/uniqueuserid'
+  const repoPath = path.join(appDir, repoName); // Use uniqueUserId here if necessary
 
   try {
     const userResponse = await axios.get("https://api.github.com/user", {
