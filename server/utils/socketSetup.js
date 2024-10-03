@@ -1,5 +1,6 @@
 const { Server: SocketServer } = require("socket.io");
 const pty = require("node-pty");
+const path = require("path");
 const fs = require("fs").promises;
 const chokidar = require("chokidar");
 
@@ -37,28 +38,37 @@ exports.setupSocketIO = (server) => {
   io.on("connection", (socket) => {
     console.log(`Socket connected`, socket.id);
 
+    // Emit an event to refresh files when a new socket connects
     socket.emit("file:refresh");
 
-    socket.on("file:change", async ({ path, content }) => {
-      const uniqueUserId = process.env.UNIQUE_USER_ID;
-      const appDir = process.env.APP_DIR;
-      const safePath = path.join(appDir, path);
+    // Handle file change events
+    socket.on("file:change", async ({ filePath, content }) => {
+      // Renamed 'path' to 'filePath'
+      const uniqueUserId = process.env.UNIQUE_USER_ID; // Optional: Use if needed for logging or other purposes
+      const appDir = process.env.APP_DIR; // Should be set to /app/uniqueuserid
+      const safePath = path.join(appDir, filePath); // Use the new variable name
 
       console.log(`Attempting to save file at: ${safePath}`); // Log before writing
+
       try {
         await fs.writeFile(safePath, content);
         console.log(`File saved: ${safePath}`);
-        io.emit("file:refresh");
+        io.emit("file:refresh"); // Notify clients about the file refresh
       } catch (error) {
         console.error(`Error saving file ${safePath}:`, error);
       }
     });
 
+    // Handle terminal write events
     socket.on("terminal:write", (data) => {
-      ptyProcess.write(data);
+      if (ptyProcess) {
+        // Ensure ptyProcess is defined
+        ptyProcess.write(data);
+      } else {
+        console.error("ptyProcess is not defined.");
+      }
     });
   });
-
   // Set up file watching with chokidar
 
   const debounceRefresh = (path) => {
