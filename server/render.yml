@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: user-container-service
+    env: docker
+    plan: free
+    repo: https://github.com/yourusername/yourrepo
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 9000
