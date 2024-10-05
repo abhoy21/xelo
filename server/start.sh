@@ -2,17 +2,17 @@
 
 # Generate a unique user identifier
 UNIQUE_USER_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-USER_DIR="/app/$UNIQUE_USER_ID"  # Change this line
+USER_DIR="/app/$UNIQUE_USER_ID"
 
 # Create user-specific directory
 mkdir -p "$USER_DIR"
 cd "$USER_DIR"
 
 # Set APP_DIR environment variable
-export APP_DIR="$USER_DIR"  # Add this line
+export APP_DIR="$USER_DIR"
 
 # Set UNIQUE_USER_ID environment variable
-export UNIQUE_USER_ID="$UNIQUE_USER_ID"  # Add this line
+export UNIQUE_USER_ID="$UNIQUE_USER_ID"
 
 # Generate Prisma client for this user
 npx prisma generate --schema=/app/prisma/schema.prisma

@@ -62,7 +62,6 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PORT=9000
 
-
 # Install required packages and Node.js
 RUN apt-get update && apt-get install -y \
     curl \
@@ -94,7 +93,6 @@ RUN npm install --production && npm install node-pty
 RUN npx prisma generate --schema=prisma/schema.prisma
 
 # Setup user directory and permissions
-# Do this BEFORE switching to non-root user
 RUN mkdir -p /app/user \
     && chmod +x /app/start.sh \
     && chown -R $USERNAME:$USERNAME /app \

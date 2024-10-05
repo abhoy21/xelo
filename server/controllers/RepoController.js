@@ -337,13 +337,17 @@ exports.runGitSaveCommands = async (req, res) => {
 
 const setGitConfig = (key, value, cwd) => {
   return new Promise((resolve, reject) => {
-    exec(`git config --global ${key} "${value}"`, { cwd }, (error) => {
-      if (error) {
-        console.error(`Error setting git config ${key}: ${error.message}`);
-        return reject(`Error setting git config ${key}: ${error.message}`);
-      }
-      resolve();
-    });
+    exec(
+      `git config --global ${key} "${value}"`,
+      { cwd, shell: "/bin/bash" },
+      (error) => {
+        if (error) {
+          console.error(`Error setting git config ${key}: ${error.message}`);
+          return reject(`Error setting git config ${key}: ${error.message}`);
+        }
+        resolve();
+      },
+    );
   });
 };
 
