@@ -1,12 +1,14 @@
 const { Server: SocketServer } = require("socket.io");
 const pty = require("node-pty");
-const path = require("path");
+
 const fs = require("fs").promises;
 const chokidar = require("chokidar");
 
 let io;
 let ptyProcess;
 let refreshTimeout = null;
+
+const userDirectory = process.env.APP_DIR;
 
 exports.setupSocketIO = (server) => {
   io = new SocketServer(server, {
@@ -43,11 +45,7 @@ exports.setupSocketIO = (server) => {
 
     // Handle file change events
     socket.on("file:change", async ({ filePath, content }) => {
-      // Renamed 'path' to 'filePath'
-      const uniqueUserId = process.env.UNIQUE_USER_ID; // Optional: Use if needed for logging or other purposes
-      const appDir = process.env.APP_DIR; // Should be set to /app/uniqueuserid
-      const safePath = path.join(appDir, filePath); // Use the new variable name
-
+      const safePath = `${userDirectory}/${filePath}`;
       console.log(`Attempting to save file at: ${safePath}`); // Log before writing
 
       try {
@@ -70,8 +68,6 @@ exports.setupSocketIO = (server) => {
     });
   });
   // Set up file watching with chokidar
-
-  const userDirectory = process.env.APP_DIR;
 
   const debounceRefresh = (path) => {
     clearTimeout(refreshTimeout);
