@@ -243,15 +243,16 @@ exports.cloneRepo = async (req, res) => {
     const repoUrl = repository.url;
 
     // Get UNIQUE_USER_ID from environment variable
-    const uniqueUserId = process.env.UNIQUE_USER_ID; // Updated line
+    const uniqueUserId = process.env.UNIQUE_USER_ID;
     if (!uniqueUserId) {
       return res.status(500).json({ message: "UNIQUE_USER_ID is not defined" });
     }
 
     // Construct the path for cloning inside the user's directory
-    const appDir = process.env.APP_DIR; // Should be '/app/uniqueuserid'
-    const repoPath = path.join(appDir, repoName); // Use uniqueUserId here if necessary
+    const appDir = process.env.APP_DIR;
+    const repoPath = path.join(appDir, repoName);
 
+    // Check if the repository already exists
     try {
       await fs.access(repoPath);
       return res.status(200).json({
@@ -259,6 +260,8 @@ exports.cloneRepo = async (req, res) => {
         repoPath,
       });
     } catch (err) {
+      // Repository does not exist; proceed to clone it
+      await executeGitCommand(`git clone ${repoUrl} ${repoPath}`, appDir);
       return res.status(200).json({
         message: `Repository cloned successfully: ${repoName}`,
         repoPath,
