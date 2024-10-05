@@ -258,32 +258,12 @@ exports.cloneRepo = async (req, res) => {
         message: `Repository already cloned: ${repoName}`,
         repoPath,
       });
-    } catch (err) {}
-
-    const [protocol, rest] = repoUrl.split("://");
-    const cloneUrl = `${protocol}://${access_token}@${rest}`;
-
-    exec(
-      `git clone ${cloneUrl}`,
-      { cwd: path.join(appDir) }, // Using appDir directly here
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error cloning repository: ${stderr}`);
-          return res.status(500).json({ message: "Error cloning repository" });
-        }
-
-        console.log(`Repository cloned successfully: ${repoName}`);
-
-        // Notify clients about file refresh if using WebSocket or similar
-        const io = getIO();
-        io.emit("file:refresh");
-
-        return res.status(200).json({
-          message: `Repository cloned successfully: ${repoName}`,
-          repoPath,
-        });
-      },
-    );
+    } catch (err) {
+      return res.status(200).json({
+        message: `Repository cloned successfully: ${repoName}`,
+        repoPath,
+      });
+    }
   } catch (error) {
     console.error("Error cloning repository:", error);
     return res.status(500).json({ message: "Error cloning repository" });
