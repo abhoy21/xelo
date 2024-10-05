@@ -71,6 +71,8 @@ exports.setupSocketIO = (server) => {
   });
   // Set up file watching with chokidar
 
+  const userDirectory = process.env.APP_DIR;
+
   const debounceRefresh = (path) => {
     clearTimeout(refreshTimeout);
     refreshTimeout = setTimeout(() => {
@@ -78,7 +80,8 @@ exports.setupSocketIO = (server) => {
     }, 300);
   };
 
-  chokidar.watch("/app/user").on("all", (event, path) => {
+  // Watch for changes in the user-specific directory
+  chokidar.watch(userDirectory).on("all", (event, path) => {
     console.log(`File change detected: ${event} on ${path}`);
     debounceRefresh(path);
   });
